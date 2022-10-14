@@ -12,6 +12,7 @@
 
 # Prepare Datasets
 
+```
 $FASTREID_DATASETS
 ├── dukemtmc
 │   └── DukeMTMC-reID
@@ -29,6 +30,7 @@ $FASTREID_DATASETS
     └── cls1
     └── cls2
     └── ...
+```
 
 # Train
 
@@ -58,3 +60,11 @@ GoogleDrive: https://drive.google.com/drive/folders/1HQRqwRVhfVBazYty3IVescKmnkW
 | genviet_sup   |    117    |     1312     |    2    |
 
 **Note**: **_sup data* is the result of clustering from some UDA repos (SECRET, IDM, PPLR, etc)
+
+# ModelZoo
+
+S3 storage: https://drive.google.com/drive/folders/1AAWC2mnLjcNHznHtBAQa-QAEXY89WPwV?usp=sharing
+
+| Backbone         |                    Train                    | Eval  |          Config          |  Top1(MAP)   |  Dim  |             Preprocess             |
+| ---------------- | :-----------------------------------------: | :---: | :----------------------: | :----------: | :---: | :--------------------------------: |
+| osnet_221014.pth | Market<br/>Canifa<br/>Tokyolife<br/>Genviet | Train | Market1501/sbs_osnet.yml | 94.8 (86.59) |  512  | RGB<br/>(128,384)<br/>mean=0,std=1 |
