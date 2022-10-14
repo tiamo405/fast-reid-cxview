@@ -6,8 +6,11 @@
 """
 
 import sys
+import os
 
 sys.path.append('.')
+pwd = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(1, os.path.join(pwd, ".."))
 
 from fastreid.config import get_cfg
 from fastreid.engine import DefaultTrainer, default_argument_parser, default_setup, launch

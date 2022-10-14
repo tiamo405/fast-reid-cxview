@@ -1,0 +1,24 @@
+_BASE_: ../Base-SBS.yml
+
+MODEL:
+  BACKBONE:
+    WITH_IBN: False
+    NAME: build_osnet_backbone
+    DEPTH: x1_0
+    FEAT_DIM: 512
+    PRETRAIN: True
+  HEADS:
+    POOL_LAYER: GlobalMaxPool   # required for onnx-tensorrt inference
+
+DATASETS:
+  NAMES: ("Market1501", "Canifa", "Tokyolife", "Genviet",)
+  TESTS: ("Market1501",)
+
+#SOLVER:
+#  WARMUP_ITERS: 2000
+#  FREEZE_ITERS: 2000
+
+#TEST:
+#  EVAL_PERIOD: -1
+
+OUTPUT_DIR: /content/drive/MyDrive/colab/reid/fast-reid/logs/market1501/sbs_osnet
