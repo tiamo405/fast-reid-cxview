@@ -35,3 +35,7 @@ model_ts*.txt
 .vscode
 _darcs
 .DS_Store
+*.jpg
+*.index
+*.zip
+*.onnx
