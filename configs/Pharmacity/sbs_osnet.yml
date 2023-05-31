@@ -1,0 +1,31 @@
+_BASE_: ../Base-SBS.yml
+
+MODEL:
+  BACKBONE:
+    WITH_IBN: False
+    NAME: build_osnet_backbone
+    DEPTH: x1_0
+    FEAT_DIM: 512
+    PRETRAIN: True
+  HEADS:
+    POOL_LAYER: GlobalMaxPool   # required for onnx-tensorrt inference
+
+KD:
+  EMA:
+    ENABLED: True
+
+INPUT:
+  AUTOAUG:
+    ENABLED: True
+    PROB: 0.4
+
+SOLVER:
+  OPT: Adam
+  MAX_EPOCH: 10
+  IMS_PER_BATCH: 16
+
+DATASETS:
+  NAMES: ("Pharmacity",)
+  TESTS: ("OccludedREID",)
+
+OUTPUT_DIR: /content/drive/MyDrive/colab/reid/fast-reid/logs/market1501/sbs_osnet

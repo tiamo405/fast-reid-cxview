@@ -11,9 +11,8 @@
 
 
 # Prepare Datasets
-
+move the data to the dataset folder and set the environment variable FASTREID_DATASETS="datasets"
 ```
-$FASTREID_DATASETS
 ├── dukemtmc
 │   └── DukeMTMC-reID
 ├── market1501
@@ -32,12 +31,19 @@ $FASTREID_DATASETS
     └── ...
 ```
 
+# Requirements
+
+```bash
+pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 -f https://download.pytorch.org/whl/torch_stable.html
+pip install -r docs/requirements.txt
+```
+
 # Train
 
 ```bash
-FASTREID_DATASETS="/content/datasets" python tools/train_net.py \
-  --config-file configs/Market1501/sbs_osnet.yml MODEL.DEVICE "cuda:0"
-  # MODEL.WEIGHTS "/content/drive/MyDrive/colab/reid/fast-reid/logs/market1501/model_final_osnet.pth"
+FASTREID_DATASETS="datasets" python tools/train_net.py \
+  --config-file configs/Market1501/sbs_osnet.yml MODEL.DEVICE "cuda:0" \
+  OUTPUT_DIR "logs/data_name/model_name"
 ```
 
 # Export ONNX

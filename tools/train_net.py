@@ -7,6 +7,7 @@
 
 import sys
 import os
+import wandb
 
 sys.path.append('.')
 pwd = os.path.dirname(os.path.realpath(__file__))
@@ -50,6 +51,8 @@ def main(args):
 
 if __name__ == "__main__":
     args = default_argument_parser().parse_args()
+    wandb.login()
+    
     print("Command Line Args:", args)
     launch(
         main,

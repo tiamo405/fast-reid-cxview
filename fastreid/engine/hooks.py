@@ -7,6 +7,8 @@ import logging
 import os
 import tempfile
 import time
+import wandb
+from wandb import AlertLevel
 from collections import Counter
 
 import torch
@@ -135,6 +137,12 @@ class IterationTimer(HookBase):
                 str(datetime.timedelta(seconds=int(total_time))),
                 str(datetime.timedelta(seconds=int(hook_time))),
             )
+        )
+
+        wandb.alert(
+            title='fast-reid',
+            text=f'Training Done',
+            level=AlertLevel.INFO
         )
 
     def before_step(self):

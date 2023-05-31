@@ -180,7 +180,7 @@ class CommonMetricPrinter(EventWriter):
     To print something in more customized ways, please implement a similar printer by yourself.
     """
 
-    def __init__(self, max_iter):
+    def __init__(self, wandb_runner, max_iter):
         """
         Args:
             max_iter (int): the maximum number of iterations to train.
@@ -189,6 +189,7 @@ class CommonMetricPrinter(EventWriter):
         self.logger = logging.getLogger(__name__)
         self._max_iter = max_iter
         self._last_write = None
+        self.wandb_runner = wandb_runner
 
     def write(self):
         storage = get_event_storage()
@@ -253,6 +254,10 @@ class CommonMetricPrinter(EventWriter):
                 memory="max_mem: {:.0f}M".format(max_mem_mb) if max_mem_mb is not None else "",
             )
         )
+        
+        for k, v in storage.histories().items():
+            if "total_loss" in k:
+                self.wandb_runner.log({"total_loss": v.median(200)})
 
 
 class EventStorage:

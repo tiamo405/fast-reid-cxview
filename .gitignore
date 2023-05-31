@@ -39,3 +39,6 @@ _darcs
 *.index
 *.zip
 *.onnx
+
+wandb/
+datasets/

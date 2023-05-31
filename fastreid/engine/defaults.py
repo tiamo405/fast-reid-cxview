@@ -12,6 +12,7 @@ import argparse
 import logging
 import os
 import sys
+import wandb
 from collections import OrderedDict
 
 import torch
@@ -236,6 +237,19 @@ class DefaultTrainer(TrainerBase):
         self.delay_epochs = cfg.SOLVER.DELAY_EPOCHS
         self.cfg = cfg
 
+        self.wandb_runner = wandb.init(project="fast-reid",
+                                       tags=["train"],
+                                       config={
+                                            "mode": "train",
+                                            "architecture": self.cfg.MODEL.BACKBONE.NAME,
+                                            "dataset": self.cfg.DATASETS.NAMES,
+                                            "feat_dim": self.cfg.MODEL.BACKBONE.FEAT_DIM,
+                                            "batch_size": self.cfg.SOLVER.IMS_PER_BATCH,
+                                            "opt": self.cfg.SOLVER.OPT,
+                                            "epochs": self.cfg.SOLVER.MAX_EPOCH,
+                                            "output_dir": self.cfg.OUTPUT_DIR
+                                        })
+
         self.register_hooks(self.build_hooks())
 
     def resume_or_load(self, resume=True):
@@ -300,7 +314,7 @@ class DefaultTrainer(TrainerBase):
         # some checkpoints may have more precise statistics than others.
 
         def test_and_save_results():
-            self._last_eval_results = self.test(self.cfg, self.model)
+            self._last_eval_results = self.test(self.wandb_runner, self.cfg, self.model)
             return self._last_eval_results
 
         # Do evaluation before checkpointer, because then if it fails,
@@ -334,7 +348,7 @@ class DefaultTrainer(TrainerBase):
         # Assume the default print/log frequency.
         return [
             # It may not always print what you want to see, since it prints "common" metrics only.
-            CommonMetricPrinter(self.max_iter),
+            CommonMetricPrinter(self.wandb_runner, self.max_iter),
             JSONWriter(os.path.join(self.cfg.OUTPUT_DIR, "metrics.json")),
             TensorboardXWriter(self.cfg.OUTPUT_DIR),
         ]
@@ -415,7 +429,7 @@ class DefaultTrainer(TrainerBase):
         return data_loader, ReidEvaluator(cfg, num_query, output_dir)
 
     @classmethod
-    def test(cls, cfg, model):
+    def test(cls, wandb_runner, cfg, model):
         """
         Args:
             cfg (CfgNode):
@@ -447,7 +461,7 @@ class DefaultTrainer(TrainerBase):
                 )
                 logger.info("Evaluation results for {} in csv format:".format(dataset_name))
                 results_i['dataset'] = dataset_name
-                print_csv_format(results_i)
+                print_csv_format(wandb_runner, results_i)
 
         if len(results) == 1:
             results = list(results.values())[0]

@@ -9,7 +9,7 @@ from tabulate import tabulate
 from termcolor import colored
 
 
-def print_csv_format(results):
+def print_csv_format(wandb, results):
     """
     Print main metrics in a format similar to Detectron2,
     so that they are easy to copypaste into a spreadsheet.
@@ -23,6 +23,8 @@ def print_csv_format(results):
     dataset_name = results.pop('dataset')
     metrics = ["Dataset"] + [k for k in results]
     csv_results = [(dataset_name, *list(results.values()))]
+
+    wandb.log({"rank-1": csv_results[0][1], "mAP": csv_results[0][4], "mINP": csv_results[0][5]})
 
     # tabulate it
     table = tabulate(
