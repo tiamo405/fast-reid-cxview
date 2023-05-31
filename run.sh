@@ -2,7 +2,7 @@
 ##train
 
 CUDA_VISIBLE_DEVICES=0 FASTREID_DATASETS="/mnt/nvme0n1/datasets/reid/" python tools/train_net.py \
-  --config-file configs/Market1501/sbs_osnet.yml MODEL.DEVICE "cuda:0"
+  --config-file configs/Pharmacity/sbs_osnet.yml MODEL.DEVICE "cuda:0"
 
 
 # CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
