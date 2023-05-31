@@ -5,10 +5,9 @@ import re
 import urllib
 import zipfile
 import logging
-import glob
-
+import os
 from .bases import ImageDataset
-from . import DATASET_REGISTRY
+from ..datasets import DATASET_REGISTRY
 
 @DATASET_REGISTRY.register()
 class Canifa(ImageDataset):
@@ -25,7 +24,7 @@ class Canifa(ImageDataset):
 
     def __init__(self, root='datasets', **kwargs):
         self.root = root
-        self.dataset_dir = osp.join(self.root, self.dataset_dir)
+        self.dataset_dir = osp.join(self.root, self.dataset_dir, self.dataset_name)
 
         train = self._process_dir(self.dataset_dir)
         query = []
@@ -50,7 +49,6 @@ class Canifa(ImageDataset):
                     ))
                 else:
                     dataset.append((img_path, pid, cam_id))
-                
 
         return dataset
 
@@ -144,128 +142,26 @@ class Genviet(ImageDataset):
 
         return dataset
 
-
 @DATASET_REGISTRY.register()
-class OccludedREID(ImageDataset):
+class PMC(ImageDataset):
     """
-    only test data
+    only train data
 
     id1
         image.jpg
     id2
         image.jpg
     """
-    dataset_dir = 'occludereid'
-    dataset_name = "OccludedREID"
+    dataset_dir = 'PMC_sup_nam'
+    dataset_name = "PMC"
 
-    def __init__(self, root='datasets', **kwargs):
-        self.root = root
-        self.dataset_dir = osp.join(self.root, self.dataset_dir, self.dataset_name)
-
-        self.query_dir = osp.join(self.dataset_dir, 'query')
-        self.gallery_dir = osp.join(self.dataset_dir, 'gallery')
-
-        required_files = [
-            self.dataset_dir,
-            self.query_dir,
-            self.gallery_dir,
-        ]
-        self.check_before_run(required_files)
-
-        train = []
-        query = self._process_dir(self.query_dir, is_train=False)
-        gallery = self._process_dir(self.gallery_dir, is_train=False)
-
-        super(OccludedREID, self).__init__(train, query, gallery, **kwargs)
-
-    def _process_dir(self, dir_path, is_train=True):
-        img_paths = glob.glob(osp.join(dir_path, '*.jpg'))
-        pattern = re.compile(r'([-\d]+)_(\d*)')
-
-        dataset = []
-        for img_path in img_paths:
-            pid, cam_id = map(int, pattern.search(img_path).groups())
-            if is_train:
-                dataset.append((
-                    img_path,
-                    self.dataset_name + "_" + str(pid),
-                    self.dataset_name + "_" + str(cam_id)
-                ))
-            else:
-                dataset.append((img_path, pid, cam_id))
-
-        return dataset
-
-
-
-@DATASET_REGISTRY.register()
-class PartialREID(ImageDataset):
-    """
-    only test data
-
-    id1
-        image.jpg
-    id2
-        image.jpg
-    """
-    dataset_dir = 'Partial_REID'
-    dataset_name = "PartialREID"
-
-    def __init__(self, root='datasets', **kwargs):
-        self.root = root
-        self.dataset_dir = osp.join(self.root, self.dataset_dir, "upper_body_images")
-
-        required_files = [
-            self.dataset_dir,
-        ]
-        self.check_before_run(required_files)
-
-        train = self._process_dir(self.dataset_dir, is_train=True)
-        query = []
-        gallery = []
-
-        super(PartialREID, self).__init__(train, query, gallery, **kwargs)
-
-    def _process_dir(self, dir_path, is_train=True):
-        img_paths = glob.glob(osp.join(dir_path, '*.jpg'))
-        pattern = re.compile(r'([-\d]+)_(\d*)')
-
-        dataset = []
-        for img_path in img_paths:
-            pid, cam_id = map(int, pattern.search(img_path).groups())
-            if is_train:
-                dataset.append((
-                    img_path,
-                    self.dataset_name + "_" + str(pid),
-                    self.dataset_name + "_" + str(cam_id)
-                ))
-            else:
-                dataset.append((img_path, pid, cam_id))
-
-        return dataset
-
-
-
-@DATASET_REGISTRY.register()
-class PDukeMTMC(ImageDataset):
-    """
-    train/test data
-
-    id1
-        image.jpg
-    id2
-        image.jpg
-    """
-    dataset_dir = 'pdukemtmc'
-    dataset_name = "PDukeMTMC"
-
-    def __init__(self, root='datasets', **kwargs):
+    def __init__(self, root='datasets/', **kwargs):
         self.root = root
         self.dataset_dir = osp.join(self.root, self.dataset_dir)
 
-        self.train_dir = osp.join(self.dataset_dir, 'train/occluded_body_images')
-        self.query_dir = osp.join(self.dataset_dir, 'test/occluded_body_images')
-        self.gallery_dir = osp.join(self.dataset_dir, 'test/whole_body_images')
+        self.train_dir = osp.join(self.dataset_dir, "train")
+        self.query_dir = osp.join(self.dataset_dir, 'query')
+        self.gallery_dir = osp.join(self.dataset_dir, 'gallery')
 
         required_files = [
             self.dataset_dir,
@@ -276,35 +172,50 @@ class PDukeMTMC(ImageDataset):
         self.check_before_run(required_files)
 
         train = self._process_dir(self.train_dir)
-        query = self._process_dir(self.query_dir, is_train=False, is_query=True)
-        gallery = self._process_dir(self.gallery_dir, is_train=False)
+        query =self._process_dir_test(self.query_dir)
+        gallery =self._process_dir_test(self.gallery_dir)
 
-        super(PDukeMTMC, self).__init__(train, query, gallery, **kwargs)
+        super(PMC, self).__init__(train, query, gallery, **kwargs)
 
-    def _process_dir(self, dir_path, is_train=True, is_query=False):
-        cls_paths = list(glob.glob(f"{dir_path}/*"))
-
+    def _process_dir(self, dir_path, is_train=True):
         dataset = []
+        cam_id = {}
+        for folder_sup in list(glob.glob(f"{dir_path}/*")):
+            name_folder = str(folder_sup).split('/')[-1]
+            cls_paths = list(glob.glob(f"{folder_sup}/*"))
+            for pid, cls_path in enumerate(cls_paths):
+                for img_path in list(glob.glob(f"{cls_path}/*.jpg")):
+                    try:
+                        cam_id = int(osp.basename(img_path).split("_")[0])
+                    except:
+                        cam_id = 0
+                    if is_train:
+                        dataset.append((
+                            img_path,
+                            self.dataset_name +"_"+ name_folder + "_" + str(pid),
+                            self.dataset_name + "_" + str(cam_id)
+                        ))
+                    else:
+                        dataset.append((img_path, pid, cam_id))
+                
+        return dataset
+    
+    def _process_dir_test(self, dir_path): 
+        dataset = []
+        cls_paths = list(glob.glob(f"{dir_path}/*"))
         for pid, cls_path in enumerate(cls_paths):
             for img_path in list(glob.glob(f"{cls_path}/*.jpg")):
 
-                if is_train:
-                    dataset.append((
-                        img_path,
-                        self.dataset_name + "_" + str(pid),
-                        self.dataset_name + "_" + str(0)
-                    ))
-                else:
-                    cam_id = 0 if is_query else -1
-                    dataset.append((img_path, pid, cam_id))
+                if 'query' in dir_path:
+                    cam_id = 0
+                else :
+                    cam_id = 1
+                dataset.append((img_path, pid, cam_id))
                 
-
         return dataset
-
-
-
+    
 @DATASET_REGISTRY.register()
-class Pharmacity(ImageDataset):
+class OccludedREID(ImageDataset):
     """
     only train data
 
@@ -313,34 +224,164 @@ class Pharmacity(ImageDataset):
     id2
         image.jpg
     """
-    dataset_dir = 'pharmacity_sup'
-    dataset_name = "Pharmacity"
+    dataset_dir = 'Occluded_REID'
+    dataset_name = "OccludedREID"
 
-    def __init__(self, root='datasets', **kwargs):
+    def __init__(self, root='datasets/', **kwargs):
         self.root = root
         self.dataset_dir = osp.join(self.root, self.dataset_dir)
 
-        train = self._process_dir(self.dataset_dir)
+        # self.train_dir = osp.join(self.dataset_dir, "train")
+        self.query_dir = osp.join(self.dataset_dir, 'occluded_body_images')
+        self.gallery_dir = osp.join(self.dataset_dir, 'whole_body_images')
+
+        required_files = [
+            self.dataset_dir,
+            # self.train_dir,
+            self.query_dir,
+            self.gallery_dir,
+        ]
+        self.check_before_run(required_files)
+
+        # train = self._process_dir(self.train_dir)
+        train = []
+        query =self._process_dir_test(self.query_dir)
+        gallery =self._process_dir_test(self.gallery_dir)
+
+        super(OccludedREID, self).__init__(train, query, gallery, **kwargs)
+
+    def _process_dir_test(self, dir_path): 
+        dataset = []
+        cls_paths = list(glob.glob(f"{dir_path}/*"))
+        for pid, cls_path in enumerate(cls_paths):
+            for img_path in list(glob.glob(f"{cls_path}/*")):
+            # for img_path in list(glob.glob(f"{cls_path}/*.jpg")):
+                if 'occluded_body_images' in dir_path:
+                    cam_id = 0
+                else :
+                    cam_id = 1
+                dataset.append((img_path, pid, cam_id))
+                
+        return dataset
+    
+
+@DATASET_REGISTRY.register()
+class P_ETHZ(ImageDataset):
+    """
+    only train data
+
+    id1
+        image.jpg
+    id2
+        image.jpg
+    """
+    dataset_dir = 'P_ETHZ'
+    dataset_name = "pethz"
+
+    def __init__(self, root='datasets/', **kwargs):
+        self.root = root
+        self.train_dir = osp.join(self.root, self.dataset_dir)
+        
+        required_files = [
+            self.train_dir,
+        ]
+        self.check_before_run(required_files)
+
+        train = self._process_dir(self.train_dir)
         query = []
         gallery = []
 
-        super(Pharmacity, self).__init__(train, query, gallery, **kwargs)
+        super(P_ETHZ, self).__init__(train, query, gallery, **kwargs)
 
-    def _process_dir(self, dir_path, is_train=True, is_query=False):
-        cls_paths = list(glob.glob(f"{dir_path}/*"))
-
+    def _process_dir(self, dir_path): 
         dataset = []
-        for pid, cls_path in enumerate(cls_paths):
-            for img_path in list(glob.glob(f"{cls_path}/*.jpg")):
+        whole_dir = os.path.join(dir_path, "whole_body_images")
+        occluded_dir = os.path.join(dir_path, "occluded_body_images")
+        cls = os.listdir(whole_dir)
 
-                if is_train:
-                    dataset.append((
-                        img_path,
-                        self.dataset_name + "_" + str(pid),
-                        self.dataset_name + "_" + str(0)
-                    ))
-                else:
-                    cam_id = 0 if is_query else -1
-                    dataset.append((img_path, pid, cam_id))
-
+        for pid, cls_id in enumerate(cls):
+            cls_path_whole = os.path.join(whole_dir, cls_id)
+            for img_path in list(glob.glob(f"{cls_path_whole}/*")):
+                camid = 0
+                p_id = self.dataset_name + "_" + str(pid)
+                camid = self.dataset_name + "_" + str(camid)
+                dataset.append((img_path, p_id, camid))
+                
+            cls_path_occluded = os.path.join(occluded_dir, cls_id)
+            for img_path in list(glob.glob(f"{cls_path_occluded}/*")):
+                camid = 0
+                p_id = self.dataset_name + "_" + str(pid)
+                camid = self.dataset_name + "_" + str(camid)
+                dataset.append((img_path, p_id, camid))
+            
         return dataset
+
+
+@DATASET_REGISTRY.register()
+class P_DukeMTMC_reid(ImageDataset):
+    """
+    only train data
+
+    id1
+        image.jpg
+    id2
+        image.jpg
+    """
+    dataset_dir = 'P-DukeMTMC-reid'
+    dataset_name = "P_DukeMTMC_reid"
+
+    def __init__(self, root='datasets/', **kwargs):
+        self.root = root
+        self.dataset_dir = osp.join(self.root, self.dataset_dir)
+        self.train_dir = osp.join(self.dataset_dir, "train")
+        self.query_dir = osp.join(self.dataset_dir, "test", 'occluded_body_images')
+        self.gallery_dir = osp.join(self.dataset_dir, "test", 'whole_body_images')
+        
+        required_files = [
+            self.train_dir,
+        ]
+        self.check_before_run(required_files)
+
+        train = self._process_dir(self.train_dir)
+        query = self._process_dir_test(self. query_dir)
+        gallery = self._process_dir_test(self.gallery_dir)
+
+        super(P_DukeMTMC_reid, self).__init__(train, query, gallery, **kwargs)
+
+    def _process_dir(self, dir_path): 
+        dataset = []
+        whole_dir = os.path.join(dir_path, "whole_body_images")
+        occluded_dir = os.path.join(dir_path, "occluded_body_images")
+        cls = os.listdir(whole_dir)
+
+        for pid, cls_id in enumerate(cls):
+            cls_path_whole = os.path.join(whole_dir, cls_id)
+            for img_path in list(glob.glob(f"{cls_path_whole}/*")):
+                camid = 0
+                p_id = self.dataset_name + "_" + str(pid)
+                camid = self.dataset_name + "_" + str(camid)
+                dataset.append((img_path, p_id, camid))
+                
+            cls_path_occluded = os.path.join(occluded_dir, cls_id)
+            for img_path in list(glob.glob(f"{cls_path_occluded}/*")):
+                camid = 0
+                p_id = self.dataset_name + "_" + str(pid)
+                camid = self.dataset_name + "_" + str(camid)
+                dataset.append((img_path, p_id, camid))
+            
+        return dataset
+    
+    def _process_dir_test(self, dir_path):
+        dataset = []
+        cls_paths = list(glob.glob(f"{dir_path}/*"))
+        for pid, cls_path in enumerate(cls_paths):
+            for img_path in list(glob.glob(f"{cls_path}/*")):
+                if 'occluded_body_images' in dir_path:
+                    cam_id = 0
+                else :
+                    cam_id = 1
+                dataset.append((img_path, pid, cam_id))
+                
+        return dataset
+    
+        
