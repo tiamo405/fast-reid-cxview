@@ -25,7 +25,7 @@ SOLVER:
   IMS_PER_BATCH: 16
 
 DATASETS:
-  NAMES: ("Pharmacity",)
+  NAMES: ('Pharmacity', 'Market1501', 'Canifa', 'Genviet', 'Tokyolife', 'DukeMTMC', 'PDukeMTMC', 'PartialREID', 'P_ETHZ', 'P_DukeMTMC_reid')
   TESTS: ("OccludedREID",)
 
 OUTPUT_DIR: /content/drive/MyDrive/colab/reid/fast-reid/logs/market1501/sbs_osnet

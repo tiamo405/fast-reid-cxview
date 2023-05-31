@@ -143,7 +143,7 @@ class Genviet(ImageDataset):
         return dataset
 
 @DATASET_REGISTRY.register()
-class PMC(ImageDataset):
+class Pharmacity(ImageDataset):
     """
     only train data
 
@@ -175,7 +175,7 @@ class PMC(ImageDataset):
         query =self._process_dir_test(self.query_dir)
         gallery =self._process_dir_test(self.gallery_dir)
 
-        super(PMC, self).__init__(train, query, gallery, **kwargs)
+        super(Pharmacity, self).__init__(train, query, gallery, **kwargs)
 
     def _process_dir(self, dir_path, is_train=True):
         dataset = []
