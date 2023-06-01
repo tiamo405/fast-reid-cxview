@@ -144,14 +144,7 @@ class Genviet(ImageDataset):
 
 @DATASET_REGISTRY.register()
 class Pharmacity(ImageDataset):
-    """
-    only train data
 
-    id1
-        image.jpg
-    id2
-        image.jpg
-    """
     dataset_dir = 'PMC_sup_nam'
     dataset_name = "PMC"
 
@@ -172,8 +165,8 @@ class Pharmacity(ImageDataset):
         self.check_before_run(required_files)
 
         train = self._process_dir(self.train_dir)
-        query =self._process_dir_test(self.query_dir)
-        gallery =self._process_dir_test(self.gallery_dir)
+        query =self._process_dir_test(self.query_dir, is_query= True)
+        gallery =self._process_dir_test(self.gallery_dir, is_query= False)
 
         super(Pharmacity, self).__init__(train, query, gallery, **kwargs)
 
@@ -200,13 +193,13 @@ class Pharmacity(ImageDataset):
                 
         return dataset
     
-    def _process_dir_test(self, dir_path): 
+    def _process_dir_test(self, dir_path, is_query = True): 
         dataset = []
         cls_paths = list(glob.glob(f"{dir_path}/*"))
         for pid, cls_path in enumerate(cls_paths):
             for img_path in list(glob.glob(f"{cls_path}/*.jpg")):
 
-                if 'query' in dir_path:
+                if is_query:
                     cam_id = 0
                 else :
                     cam_id = 1

@@ -19,3 +19,4 @@ tabulate
 gdown
 faiss-gpu
 wandb
+Cython
