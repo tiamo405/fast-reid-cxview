@@ -28,4 +28,4 @@ DATASETS:
   NAMES: ('Pharmacity', 'Market1501', 'Canifa', 'Genviet', 'Tokyolife', 'DukeMTMC', 'P_ETHZ', 'P_DukeMTMC_reid')
   TESTS: ("Pharmacity",)
 
-OUTPUT_DIR: /content/drive/MyDrive/colab/reid/fast-reid/logs/market1501/sbs_osnet
+OUTPUT_DIR: logs/PMC/sbs_osnet

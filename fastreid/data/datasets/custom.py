@@ -310,6 +310,60 @@ class P_ETHZ(ImageDataset):
         return dataset
 
 
+# @DATASET_REGISTRY.register()
+# class P_DukeMTMC_reid(ImageDataset):
+#     """
+#     train/test data
+
+#     id1
+#         image.jpg
+#     id2
+#         image.jpg
+#     """
+#     dataset_dir = 'P-DukeMTMC-reid'
+#     dataset_name = "P_DukeMTMC_reid"
+
+#     def __init__(self, root='datasets', **kwargs):
+#         self.root = root
+#         self.dataset_dir = osp.join(self.root, self.dataset_dir)
+
+#         self.train_dir = osp.join(self.dataset_dir, 'train/occluded_body_images')
+#         self.query_dir = osp.join(self.dataset_dir, 'test/occluded_body_images')
+#         self.gallery_dir = osp.join(self.dataset_dir, 'test/whole_body_images')
+
+#         required_files = [
+#             self.dataset_dir,
+#             self.train_dir,
+#             self.query_dir,
+#             self.gallery_dir,
+#         ]
+#         self.check_before_run(required_files)
+
+#         train = self._process_dir(self.train_dir)
+#         query = self._process_dir(self.query_dir, is_train=False, is_query=True)
+#         gallery = self._process_dir(self.gallery_dir, is_train=False)
+
+#         super(P_DukeMTMC_reid, self).__init__(train, query, gallery, **kwargs)
+
+#     def _process_dir(self, dir_path, is_train=True, is_query=False):
+#         cls_paths = list(glob.glob(f"{dir_path}/*"))
+
+#         dataset = []
+#         for pid, cls_path in enumerate(cls_paths):
+#             for img_path in list(glob.glob(f"{cls_path}/*.jpg")):
+
+#                 if is_train:
+#                     dataset.append((
+#                         img_path,
+#                         self.dataset_name + "_" + str(pid),
+#                         self.dataset_name + "_" + str(0)
+#                     ))
+#                 else:
+#                     cam_id = 0 if is_query else -1
+#                     dataset.append((img_path, pid, cam_id))
+                
+
+#         return dataset
 @DATASET_REGISTRY.register()
 class P_DukeMTMC_reid(ImageDataset):
     """
@@ -336,8 +390,8 @@ class P_DukeMTMC_reid(ImageDataset):
         self.check_before_run(required_files)
 
         train = self._process_dir(self.train_dir)
-        query = self._process_dir_test(self. query_dir)
-        gallery = self._process_dir_test(self.gallery_dir)
+        query = self._process_dir_test(self. query_dir, is_query= True)
+        gallery = self._process_dir_test(self.gallery_dir, is_query= False)
 
         super(P_DukeMTMC_reid, self).__init__(train, query, gallery, **kwargs)
 
@@ -364,17 +418,15 @@ class P_DukeMTMC_reid(ImageDataset):
             
         return dataset
     
-    def _process_dir_test(self, dir_path):
+    def _process_dir_test(self, dir_path, is_query= True):
         dataset = []
         cls_paths = list(glob.glob(f"{dir_path}/*"))
         for pid, cls_path in enumerate(cls_paths):
             for img_path in list(glob.glob(f"{cls_path}/*")):
-                if 'occluded_body_images' in dir_path:
+                if is_query:
                     cam_id = 0
                 else :
                     cam_id = 1
                 dataset.append((img_path, pid, cam_id))
                 
         return dataset
-    
-        
