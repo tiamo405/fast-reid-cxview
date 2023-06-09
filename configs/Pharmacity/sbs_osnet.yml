@@ -21,11 +21,11 @@ INPUT:
 
 SOLVER:
   OPT: Adam
-  MAX_EPOCH: 120
+  MAX_EPOCH: 200
   IMS_PER_BATCH: 64
 
 DATASETS:
-  NAMES: ('Pharmacity', 'Market1501', 'Canifa', 'Genviet', 'Tokyolife', 'DukeMTMC', 'P_ETHZ', 'P_DukeMTMC_reid')
+  NAMES: ('Pharmacity',)
   TESTS: ("Pharmacity",)
 
-OUTPUT_DIR: logs/PMC/sbs_osnet
+OUTPUT_DIR: logs/PMC/sbs_osnet_PMC
