@@ -36,7 +36,8 @@ def get_parser():
     parser.add_argument(
         "--height",
         type=int,
-        default=256,
+        # default=256,
+        default=384,
         help="height of image"
     )
     parser.add_argument(

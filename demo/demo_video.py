@@ -53,32 +53,79 @@
 # cv2.destroyAllWindows()
 
 import numpy as np
-
+import torch
 # Đường dẫn đến hai tệp npy chứa đặc trưng của hai người
 feature_file_1 = "demo_output/0_000001.npy"
 feature_file_2 = "demo_output/0_000005.npy"
 feature_file_3 = "demo_output/0_000010.npy"
-feature_file_4 = "demo_output/0_000002.npy"
+feature_file_4 = "demo_output/0_000002.npy"# test
 feature_file_5 = "demo_output/0_001929.npy"
-feature_file_6 = "demo_output/0_001931.npy"
+feature_file_6 = "demo_output/0_001931.npy" # test
 
 # Đọc tệp npy và lấy đặc trưng của hai người
-feature_1 = np.load(feature_file_1)
-feature_2 = np.load(feature_file_2)
-feature_3 = np.load(feature_file_3)
-feature_4 = np.load(feature_file_4)
-feature_5 = np.load(feature_file_5)
-feature_6 = np.load(feature_file_6)
+feature_1 = torch.from_numpy(np.load(feature_file_1))
+feature_2 = torch.from_numpy(np.load(feature_file_2))
+feature_3 = torch.from_numpy(np.load(feature_file_3))
+feature_4 = torch.from_numpy(np.load(feature_file_4))
+feature_5 = torch.from_numpy(np.load(feature_file_5))
+feature_6 = torch.from_numpy(np.load(feature_file_6))
 
-# Tính toán khoảng cách Euclidean giữa hai đặc trưng
-distance = np.linalg.norm(feature_5 - feature_6)
-print(distance)
-# Xác định ngưỡng khoảng cách để quyết định hai người có giống nhau hay không
-threshold = 0.6  # Ngưỡng khoảng cách
+query = []
+gallery = []
+query.append(feature_1)
+query.append(feature_2)
+query.append(feature_3)
+query.append(feature_5)
+query = torch.cat(query, dim=0)
+gallery.append(feature_4)
+gallery.append(feature_6)
+gallery = torch.cat(gallery, dim=0)
 
-# Kiểm tra xem hai người có giống nhau hay không
-if distance < threshold:
-    print("Hai người giống nhau")
-else:
-    print("Hai người khác nhau")
+distmat = 1 - torch.mm(query, gallery.t())
+distmat = distmat.numpy()
+indices = np.argsort(distmat, axis=1)
+res = indices[:, 0]
+
+# n_gallery = indices.shape[1]
+# n_query = indices.shape[0]
+
+# res = matrix = np.full((n_gallery, n_query), n_gallery+1)
+
+# for i in range(n_query):
+#     for j in range(n_gallery):
+#         res[indices[i][j]][i] = min(j, res[indices[i][j]][i])
+# # print(res)
+# min_indices = np.nanargmin(res, axis=1)
+# print(min_indices)
+
+# # Tính toán khoảng cách Euclidean giữa hai đặc trưng
+# distance = np.linalg.norm(feature_5 - feature_6)
+# print(distance)
+# # Xác định ngưỡng khoảng cách để quyết định hai người có giống nhau hay không
+# threshold = 0.6  # Ngưỡng khoảng cách
+
+# # Kiểm tra xem hai người có giống nhau hay không
+# if distance < threshold:
+#     print("Hai người giống nhau")
+# else:
+#     print("Hai người khác nhau")
+
+# import numpy as np
+
+# indices = np.array([[2, 0, 1, 3, 4, 6, 5],
+#        [3, 4, 6, 2, 1, 5, 0],
+#        [6, 5, 4, 3, 1, 2, 0]])
+
+# n_gallery = indices.shape[1]
+# n_query = indices.shape[0]
+
+# res = matrix = np.full((n_gallery, n_query), n_gallery+1)
+
+# for i in range(n_query):
+#     for j in range(n_gallery):
+#         res[indices[i][j]][i] = min(j, res[indices[i][j]][i])
+# # print(res)
+# min_indices = np.nanargmin(res, axis=1)
+# print(min_indices)
+    
 
