@@ -142,8 +142,8 @@ if __name__ == '__main__':
     features.append(feat)
     features.append(feat)
     features.append(feat)
-    # print(reid.find_id(feat))
-    print(features.shape)
+    print(reid.find_id(feat))
+    # print(features.shape)
     
     
     

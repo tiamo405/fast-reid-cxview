@@ -22,6 +22,9 @@ import numpy as np
 import torchvision.transforms as T
 
 sys.path.append('../..')
+root = os.getcwd()
+pwd = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, root)
 
 from fastreid.data.build import _root
 from fastreid.data.data_utils import read_image

@@ -55,12 +55,12 @@
 import numpy as np
 import torch
 # Đường dẫn đến hai tệp npy chứa đặc trưng của hai người
-feature_file_1 = "demo_output/0_000001.npy"
-feature_file_2 = "demo_output/0_000005.npy"
-feature_file_3 = "demo_output/0_000010.npy"
-feature_file_4 = "demo_output/0_000002.npy"# test
-feature_file_5 = "demo_output/0_001929.npy"
-feature_file_6 = "demo_output/0_001931.npy" # test
+feature_file_1 = "demo_output/1.npy"
+feature_file_2 = "demo_output/5.npy"
+feature_file_3 = "demo_output/10.npy"
+feature_file_4 = "demo_output/2.npy"# test
+feature_file_5 = "demo_output/29.npy"
+feature_file_6 = "demo_output/31.npy" # test
 
 # Đọc tệp npy và lấy đặc trưng của hai người
 feature_1 = torch.from_numpy(np.load(feature_file_1))
@@ -69,7 +69,7 @@ feature_3 = torch.from_numpy(np.load(feature_file_3))
 feature_4 = torch.from_numpy(np.load(feature_file_4))
 feature_5 = torch.from_numpy(np.load(feature_file_5))
 feature_6 = torch.from_numpy(np.load(feature_file_6))
-
+print(1.0-feature_1)
 query = []
 gallery = []
 query.append(feature_1)
