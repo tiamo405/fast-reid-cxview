@@ -55,36 +55,36 @@
 import numpy as np
 import torch
 # Đường dẫn đến hai tệp npy chứa đặc trưng của hai người
-feature_file_1 = "demo_output/1.npy"
-feature_file_2 = "demo_output/5.npy"
-feature_file_3 = "demo_output/10.npy"
-feature_file_4 = "demo_output/2.npy"# test
-feature_file_5 = "demo_output/29.npy"
-feature_file_6 = "demo_output/31.npy" # test
+# feature_file_1 = "demo_output/1.npy"
+# feature_file_2 = "demo_output/5.npy"
+# feature_file_3 = "demo_output/10.npy"
+# feature_file_4 = "demo_output/2.npy"# test
+# feature_file_5 = "demo_output/29.npy"
+# feature_file_6 = "demo_output/31.npy" # test
 
-# Đọc tệp npy và lấy đặc trưng của hai người
-feature_1 = torch.from_numpy(np.load(feature_file_1))
-feature_2 = torch.from_numpy(np.load(feature_file_2))
-feature_3 = torch.from_numpy(np.load(feature_file_3))
-feature_4 = torch.from_numpy(np.load(feature_file_4))
-feature_5 = torch.from_numpy(np.load(feature_file_5))
-feature_6 = torch.from_numpy(np.load(feature_file_6))
-print(1.0-feature_1)
-query = []
-gallery = []
-query.append(feature_1)
-query.append(feature_2)
-query.append(feature_3)
-query.append(feature_5)
-query = torch.cat(query, dim=0)
-gallery.append(feature_4)
-gallery.append(feature_6)
-gallery = torch.cat(gallery, dim=0)
+# # Đọc tệp npy và lấy đặc trưng của hai người
+# feature_1 = torch.from_numpy(np.load(feature_file_1))
+# feature_2 = torch.from_numpy(np.load(feature_file_2))
+# feature_3 = torch.from_numpy(np.load(feature_file_3))
+# feature_4 = torch.from_numpy(np.load(feature_file_4))
+# feature_5 = torch.from_numpy(np.load(feature_file_5))
+# feature_6 = torch.from_numpy(np.load(feature_file_6))
+# print(1.0-feature_1)
+# query = []
+# gallery = []
+# query.append(feature_1)
+# query.append(feature_2)
+# query.append(feature_3)
+# query.append(feature_5)
+# query = torch.cat(query, dim=0)
+# gallery.append(feature_4)
+# gallery.append(feature_6)
+# gallery = torch.cat(gallery, dim=0)
 
-distmat = 1 - torch.mm(query, gallery.t())
-distmat = distmat.numpy()
-indices = np.argsort(distmat, axis=1)
-res = indices[:, 0]
+# distmat = 1 - torch.mm(query, gallery.t())
+# distmat = distmat.numpy()
+# indices = np.argsort(distmat, axis=1)
+# res = indices[:, 0]
 
 # n_gallery = indices.shape[1]
 # n_query = indices.shape[0]
@@ -129,3 +129,8 @@ res = indices[:, 0]
 # print(min_indices)
     
 
+feature_pth = np.load("onnx_output/gallery_1.npy") 
+feature_onnx = np.load("demo_output/gallery_1.npy")
+# feature_trt = np.load("null")
+print("onnx và pth: ",np.testing.assert_allclose(feature_onnx, feature_pth, rtol=1e-3, atol=1e-6))
+# print("trt và pth: ",np.testing.assert_allclose(feature_trt, feature_pth, rtol=1e-3, atol=1e-6))

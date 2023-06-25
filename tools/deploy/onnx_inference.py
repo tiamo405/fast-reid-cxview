@@ -69,7 +69,8 @@ def normalize(nparray, order=2, axis=-1):
 if __name__ == "__main__":
     args = get_parser().parse_args()
 
-    ort_sess = onnxruntime.InferenceSession(args.model_path)
+    # ort_sess = onnxruntime.InferenceSession(args.model_path) # old
+    ort_sess = onnxruntime.InferenceSession(args.model_path, providers=['TensorrtExecutionProvider'])
 
     input_name = ort_sess.get_inputs()[0].name
 

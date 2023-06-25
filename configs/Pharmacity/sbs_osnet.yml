@@ -22,10 +22,10 @@ INPUT:
 SOLVER:
   OPT: Adam
   MAX_EPOCH: 200
-  IMS_PER_BATCH: 64
+  IMS_PER_BATCH: 32
 
 DATASETS:
   NAMES: ('Pharmacity',)
   TESTS: ("Pharmacity",)
 
-OUTPUT_DIR: logs/PMC/sbs_osnet_PMC
+OUTPUT_DIR: logs/PMC/pmc_24062023

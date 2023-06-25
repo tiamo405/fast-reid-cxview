@@ -144,7 +144,7 @@ class TrtEngine:
 
         return [out.host.reshape(self._batch_size, -1) for out in self._output[::-1]]
 
-    def inference_on_images(self, imgs, new_size=(256, 128)):
+    def inference_on_images(self, imgs, new_size=(384, 128)):
         trt_inputs = []
         for img in imgs:
             input_ndarray = self.preprocess(img, *new_size)

@@ -93,7 +93,5 @@ if __name__ == '__main__':
         for path in tqdm.tqdm(args.input):
             img = cv2.imread(path)
             feat = demo.run_on_image(img)
-            print(feat)
             feat = postprocess(feat)
-            print(feat)
             np.save(os.path.join(args.output, os.path.basename(path).split('.')[0] + '.npy'), feat)

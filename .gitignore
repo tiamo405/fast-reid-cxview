@@ -42,3 +42,5 @@ _darcs
 
 wandb/
 datasets/
+cpp/build
+output/

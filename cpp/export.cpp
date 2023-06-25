@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 	onnxFile.seekg (0, onnxFile.beg);
 
 	auto *buffer = new char[size];
-	onnxFile.read(buffer, size);
+	onnxFile.read(buffer, size); 
 	onnxFile.close();
 
 	bool verbose = false;
