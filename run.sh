@@ -27,8 +27,9 @@
 #                     --opts MODEL.WEIGHTS logs/PMC/pmc_09062023/model_best.pth
 
 # export onnx
-# python tools/deploy/onnx_export.py --config-file logs/PMC/pmc_09062023/config.yaml \
-#   --name pmc_onnx --output logs/PMC/pmc_09062023/onnx_model \
+python tools/deploy/onnx_export.py --config-file logs/PMC/pmc_09062023/config.yaml \
+  --name pmc_onnx --output logs/PMC/pmc_09062023/onnx_model \
+
 #   --opts MODEL.WEIGHTS logs/PMC/pmc_09062023/model_best.pth \
 # python custom_onnx_export.py --config-file logs/PMC/pmc_09062023/config.yaml \
 #   --name pmc_onnx --output logs/PMC/pmc_09062023/onnx_model \
@@ -38,12 +39,14 @@
 
 # test model onnx
 # python tools/deploy/onnx_inference.py --height 384 --width 128\
-#   --model-path test.onnx \
+#   --model-path logs/PMC/pmc_09062023/onnx_model/pmc_onnx.onnx \
 #  --input "demo/gallery_1.jpg" --output onnx_output
 
-# docker run --runtime nvidia -itd --ipc=host --net=host --privileged --name reid-tensorrt -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /mnt/nvme0n1/phuongnam/fast-reid:/workspace nvcr.io/nvidia/pytorch:20.03-py3
+# python tools/deploy/onnx_inference.py --height 384 --width 128\
+#   --model-path pmc_onnx_2.onnx \
+#  --input "demo/gallery_1.jpg" --output onnx_output
 
-# docker run --name fastreid-export --runtime nvidia -dit -v /mnt/nvme0n1/phuongnam/fast-reid:/workspace nvcr.io/nvidia/pytorch:20.03-py3
+# docker run --gpus device=0 --name test --runtime nvidia -dit -v /mnt/nvme0n1/phuongnam/fast-reid:/workspace nvcr.io/nvidia/pytorch:20.03-py3
 
 # python tools/deploy/trt_inference.py --model-path outputs/trt_model/pmc_trt.engine \
 #   --input demo/gallery_1.jpg --batch-size 1 --height 384 --width 128 --output trt_output 
@@ -54,9 +57,20 @@
 # so sánh kết quả khi export
 # python demo/sosanhweight.py
 
-# trtexec --explicitBatch --onnx=nano_rotate_20220620.onnx \
-#         --minShapes=data:1x3x480x480 \
-#         --optShapes=data:3x3x480x480 \
-#         --maxShapes=data:5x3x480x480 \
-#         --shapes=data:3x3x480x480 \
+# trtexec --explicitBatch --onnx=logs/PMC/pmc_09062023/onnx_model/pmc_onnx.onnx \
+#         --minShapes=data:1x3x384x128 \
+#         --optShapes=data:3x3x384x128 \
+#         --maxShapes=data:5x3x384x128 \
+#         --shapes=data:3x3x384x128 \
 #         --saveEngine=onnx_dynamic.engine
+# nv-tensorrt-repo-ubuntu1804-cuda10.2-trt7.0.0.11-ga-20191216_1-1_amd64.deb
+# os="ubuntu1x04"
+# tag="cudax.x-trt7.x.x.x-ga-yyyymmdd"
+# sudo dpkg -i nv-tensorrt-repo-ubuntu1804-cuda10.2-trt7.0.0.11-ga-20191216_1-1_amd64.deb
+# sudo apt-key add /var/nv-tensorrt-repo-cuda10.2-trt7.0.0.11-ga-20191216/7fa2af80.pub
+
+# sudo apt-get update
+# sudo apt-get install tensorrt
+
+docker run --gpus device=0 --name fastreid-export --runtime nvidia -dit -v /mnt/nvme0n1/phuongnam/fast-reid:/workspace nvcr.io/nvidia/pytorch:20.03-py3
+./trtexec --loadEngine=/workspace/cpp/build/model.plan --explicitBatch --shapes=input_0:1x3x384x128

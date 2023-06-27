@@ -132,5 +132,6 @@ import torch
 feature_pth = np.load("onnx_output/gallery_1.npy") 
 feature_onnx = np.load("demo_output/gallery_1.npy")
 # feature_trt = np.load("null")
-print("onnx và pth: ",np.testing.assert_allclose(feature_onnx, feature_pth, rtol=1e-3, atol=1e-6))
+if np.testing.assert_allclose(feature_onnx, feature_pth, rtol=1e-3, atol=1e-6) is None :
+    print("export model onnx done",)
 # print("trt và pth: ",np.testing.assert_allclose(feature_trt, feature_pth, rtol=1e-3, atol=1e-6))

@@ -39,6 +39,7 @@ _darcs
 *.index
 *.zip
 *.onnx
+*.deb
 
 wandb/
 datasets/
