@@ -1,6 +1,6 @@
 _BASE_: ../Base-SBS.yml
 
-MODEL:
+MODEL:  
   BACKBONE:
     WITH_IBN: False
     NAME: build_osnet_backbone
@@ -28,4 +28,4 @@ DATASETS:
   NAMES: ('Pharmacity',)
   TESTS: ("Pharmacity",)
 
-OUTPUT_DIR: logs/PMC/pmc_24062023
+OUTPUT_DIR: logs/PMC/pmc_05072023

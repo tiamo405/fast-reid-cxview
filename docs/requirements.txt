@@ -20,5 +20,5 @@ gdown
 faiss-gpu
 wandb
 Cython
-onnxruntime
-onnx
+# onnxruntime
+# onnx

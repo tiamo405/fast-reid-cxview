@@ -168,6 +168,10 @@ class Pharmacity(ImageDataset):
         query =self._process_dir_test(self.query_dir, is_query= True)
         gallery =self._process_dir_test(self.gallery_dir, is_query= False)
 
+        # train = self._process_dir_test(self.gallery_dir, is_query= False)
+        # query =self._process_dir_test(self.query_dir, is_query= True)
+        # gallery =self._process_dir(self.train_dir, is_train= False)
+
         super(Pharmacity, self).__init__(train, query, gallery, **kwargs)
 
     def _process_dir(self, dir_path, is_train=True):
